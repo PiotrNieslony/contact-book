@@ -14,7 +14,7 @@ struct Kontakt {
 int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
     system("cls");
     Kontakt pojedynczyKontakt;
-    pojedynczyKontakt.id = iloscKontaktow+1;
+    pojedynczyKontakt.id = kontakty[iloscKontaktow-1].id+1;
     cout << "Podaj imie: ";
     cin >> pojedynczyKontakt.imie;
     cout << "Podaj nazwisko: ";
@@ -66,14 +66,14 @@ void wyswieltLinieOdzielajaca() {
 void wyswietlNaglowekTabeli() {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
     printf ("|%-3s|%-12s|%-12s|%-11s|%-30s|%-45s|\n",
-            "lp.", "nr", "nazwisko", "tel", "email", "adres");
+            "id", "nr", "nazwisko", "tel", "email", "adres");
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
     wyswieltLinieOdzielajaca();
 }
 
 void wyswietlWierszTabeli(vector<Kontakt> &kontakty, int i) {
     printf ("|%-3i|%-12s|%-12s|%-11s|%-30s|%-45s|\n",
-            i+1,
+            kontakty[i].id,
             kontakty[i].imie.c_str(),
             kontakty[i].nazwisko.c_str(),
             kontakty[i].telefon.c_str(),
@@ -138,14 +138,39 @@ void wyszukiwanieNazwiska(vector<Kontakt> &kontakty, string szukanaWartosc, int 
     komunikatOilosciZnalezionychKontaktow(iloscZnalezionychKontaktow, szukanaWartosc);
 }
 
+void zapiszWszystkieKontaktyDoPliku(vector<Kontakt> &kontakty, int iloscKontaktow) {
+    remove("kontakty-kopia.txt");
+    if((rename("kontakty.txt", "kontakty-kopia.txt")) != 0) {
+        cout << ( "Blad przy tworzeniu kopii pliku" ) << endl;
+        return;
+    }
+    fstream plik;
+    plik.open("kontakty.txt", ios::out | ios::app);
+    if(plik.good() == false) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        system("pause");
+        return;
+    }
+    for(int i = 0; i < iloscKontaktow; i++) {
+        plik << kontakty[i].id << "|";
+        plik << kontakty[i].imie << "|";
+        plik << kontakty[i].nazwisko << "|";
+        plik << kontakty[i].telefon << "|";
+        plik << kontakty[i].email << "|";
+        plik << kontakty[i].adres << "|" << endl;
+    }
+    plik.close();
+}
+
 int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     string linia;
     Kontakt pojedynczyKontakt;
     int i = 0;
-    size_t pozycjaZnakuOd =0;
+    size_t pozycjaZnakuOd;
     size_t pozycjaSeparatora;
     int iloscZnakow;
-
 
     fstream plik;
     plik.open("kontakty.txt",ios::in);
@@ -158,8 +183,9 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     }
 
     while(getline(plik, linia)) {
+
         pozycjaSeparatora = linia.find("|");
-        pojedynczyKontakt.id = atoi(linia.substr(pozycjaZnakuOd, pozycjaSeparatora).c_str());
+        pojedynczyKontakt.id = atoi(linia.substr(0, pozycjaSeparatora).c_str());
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
@@ -194,12 +220,85 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     return i; //ilosc kontaktow
 }
 
+void komunikatPoprawnejEdycjiDanch() {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
+    cout << "Dane zostaly zmienione." << endl;
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);// bia³y
+    Sleep(1900);
+}
+
+void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id, int poleDoEdycji) {
+    string nowaWartosc;
+    for(int i = 0; i < iloscKontaktow; i++) {
+        if(kontakty[i].id == id) {
+            switch(poleDoEdycji) {
+            case 1:
+                cout << "Wprowadz imie: ";
+                cin >> nowaWartosc;
+                kontakty[i].imie = nowaWartosc;
+                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                komunikatPoprawnejEdycjiDanch();
+                return;
+            case 2:
+                cout << "Wprowadz nazwisko: ";
+                cin >> nowaWartosc;
+                kontakty[i].nazwisko = nowaWartosc;
+                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                komunikatPoprawnejEdycjiDanch();
+                return;
+            case 3:
+                cout << "Wprowadz telefon: ";
+                cin >> nowaWartosc;
+                kontakty[i].telefon = nowaWartosc;
+                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                komunikatPoprawnejEdycjiDanch();
+                return;
+            case 4:
+                cout << "Wprowadz emial: ";
+                cin >> nowaWartosc;
+                kontakty[i].email = nowaWartosc;
+                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                komunikatPoprawnejEdycjiDanch();
+                return;
+            case 5:
+                cout << "Wprowadz adres: ";
+                cin >> nowaWartosc;
+                kontakty[i].adres = nowaWartosc;
+                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                komunikatPoprawnejEdycjiDanch();
+                return;
+            case 6:
+                cout << "Wprowadz imie: ";
+                cin >> nowaWartosc;
+                kontakty[i].imie = nowaWartosc;
+                cout << "Wprowadz nazwisko: ";
+                cin >> nowaWartosc;
+                kontakty[i].nazwisko = nowaWartosc;
+                cout << "Wprowadz telefon: ";
+                cin >> nowaWartosc;
+                kontakty[i].telefon = nowaWartosc;
+                cout << "Wprowadz emial: ";
+                cin >> nowaWartosc;
+                kontakty[i].email = nowaWartosc;
+                cout << "Wprowadz adres: ";
+                cin >> nowaWartosc;
+                kontakty[i].adres = nowaWartosc;
+                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                komunikatPoprawnejEdycjiDanch();
+                return;
+            }
+        }
+    }
+    cout << "Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty" << endl;
+}
+
 int main() {
     vector<Kontakt> kontakty;
 
     int iloscKontaktow = wczytajKontaktyZPliku(kontakty);
 
     char wybor;
+    int id;
 
     string szukanaWartosc;
 
@@ -212,9 +311,11 @@ int main() {
         cout << "Ilosc zapisanych kontaktow: "<< iloscKontaktow << endl << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
         cout << "MENU GLOWNE: "<< endl;
-        cout << "1. Dodaj dane przyjaciela" << endl;
-        cout << "3. Znajdz kontakt" << endl;
-        cout << "5. Wyswietl dane wszystkich zapisanych przyjaciol" << endl;
+        cout << "1. Dodaj nowy kontakt" << endl;
+        cout << "2. Edytuj kontakt" << endl;
+        cout << "3. Usun kontakt" << endl;
+        cout << "4. Znajdz kontakt" << endl;
+        cout << "5. Wyswietl wszystkie zapisane kontaky" << endl;
         cout << "9. Zakoncz program" << endl << endl;
         cout << "wybor: ";
         cin >> wybor;
@@ -224,7 +325,29 @@ int main() {
         case '1':
             iloscKontaktow = zapisywanieKontaktu(kontakty, iloscKontaktow);
             break;
+        case '2':
+            system("cls");
+            cout << "EDYCJA:" << endl;
+            cout << "Co chcesz edytowac?:" << endl;
+            cout << "1. Imie" << endl;
+            cout << "2. Nazwisko" << endl;
+            cout << "3. Telefon" << endl;
+            cout << "4. Email" << endl;
+            cout << "5. Adres" << endl;
+            cout << "6. Wszystko" << endl;
+            cout << "9. Nic" << endl << endl;
+            cout << "wybor: ";
+            cin >> wybor;
+            system("cls");
+            if (wybor == '9') break;
+            cout << "EDYCJA:" << endl;
+            cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
+            cin >> id;
+            edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48);
+            break;
         case '3':
+            break;
+        case '4':
             system("cls");
             cout << "WYSZUKIWANIE:" << endl;
             cout << "1. Wyszukaj imie" << endl;
