@@ -13,19 +13,22 @@ struct Kontakt {
 
 int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
     system("cls");
-    kontakty[iloscKontaktow].id = iloscKontaktow+1;
+    Kontakt pojedynczyKontakt;
+    pojedynczyKontakt.id = iloscKontaktow+1;
     cout << "Podaj imie: ";
-    cin >> kontakty[iloscKontaktow].imie;
+    cin >> pojedynczyKontakt.imie;
     cout << "Podaj nazwisko: ";
-    cin >> kontakty[iloscKontaktow].nazwisko;
+    cin >> pojedynczyKontakt.nazwisko;
     cout << "Podaj nr. telefonu: ";
     cin.sync();
-    getline(cin,kontakty[iloscKontaktow].telefon);
+    getline(cin,pojedynczyKontakt.telefon);
     cout << "Podaj adres email: ";
-    cin >> kontakty[iloscKontaktow].email;
+    cin >> pojedynczyKontakt.email;
     cout << "Podaj adres: ";
     cin.sync();
-    getline(cin,kontakty[iloscKontaktow].adres);
+    getline(cin,pojedynczyKontakt.adres);
+
+    kontakty.push_back(pojedynczyKontakt);
 
     fstream plik;
     plik.open("kontakty.txt", ios::out | ios::app);
@@ -36,12 +39,12 @@ int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
         system("pause");
         return 0;
     }
-    plik << kontakty[iloscKontaktow].id << "|";
-    plik << kontakty[iloscKontaktow].imie << "|";
-    plik << kontakty[iloscKontaktow].nazwisko << "|";
-    plik << kontakty[iloscKontaktow].telefon << "|";
-    plik << kontakty[iloscKontaktow].email << "|";
-    plik << kontakty[iloscKontaktow].adres << "|" << endl;
+    plik << pojedynczyKontakt.id << "|";
+    plik << pojedynczyKontakt.imie << "|";
+    plik << pojedynczyKontakt.nazwisko << "|";
+    plik << pojedynczyKontakt.telefon << "|";
+    plik << pojedynczyKontakt.email << "|";
+    plik << pojedynczyKontakt.adres << "|" << endl;
     plik.close();
 
     iloscKontaktow++;
