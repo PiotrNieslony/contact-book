@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <cstdio>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ struct Kontakt {
     string imie, nazwisko, telefon, email, adres;
 };
 
-int zapisywanieKontaktu(Kontakt kontakty[], int iloscKontaktow) {
+int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
     system("cls");
     kontakty[iloscKontaktow].id = iloscKontaktow+1;
     cout << "Podaj imie: ";
@@ -67,7 +68,7 @@ void wyswietlNaglowekTabeli() {
     wyswieltLinieOdzielajaca();
 }
 
-void wyswietlWierszTabeli(Kontakt kontakty[], int i) {
+void wyswietlWierszTabeli(vector<Kontakt> &kontakty, int i) {
     printf ("|%-3i|%-12s|%-12s|%-11s|%-30s|%-45s|\n",
             i+1,
             kontakty[i].imie.c_str(),
@@ -77,7 +78,7 @@ void wyswietlWierszTabeli(Kontakt kontakty[], int i) {
             kontakty[i].adres.c_str());
 }
 
-void wyswietlanieWszystkichKontaktow(Kontakt kontakty[], int iloscKontaktow) {
+void wyswietlanieWszystkichKontaktow(vector<Kontakt> &kontakty, int iloscKontaktow) {
     wyswietlNaglowekTabeli();
     for(int i=0; i < iloscKontaktow; i++) {
         wyswietlWierszTabeli(kontakty, i);
@@ -108,7 +109,7 @@ void komunikatOilosciZnalezionychKontaktow(int iloscZnalezionychKontaktow, strin
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15); // bialy
 }
 
-void wyszukiwanieImienia(Kontakt kontakty[], string szukanaWartosc, int iloscKontaktow ) {
+void wyszukiwanieImienia(vector<Kontakt> &kontakty, string szukanaWartosc, int iloscKontaktow ) {
     int iloscZnalezionychKontaktow = 0;
     wyswietlNaglowekTabeli();
     for(int i=0; i < iloscKontaktow; i++) {
@@ -121,7 +122,7 @@ void wyszukiwanieImienia(Kontakt kontakty[], string szukanaWartosc, int iloscKon
     komunikatOilosciZnalezionychKontaktow(iloscZnalezionychKontaktow, szukanaWartosc);
 }
 
-void wyszukiwanieNazwiska(Kontakt kontakty[], string szukanaWartosc, int iloscKontaktow ) {
+void wyszukiwanieNazwiska(vector<Kontakt> &kontakty, string szukanaWartosc, int iloscKontaktow ) {
     int iloscZnalezionychKontaktow = 0;
     wyswietlNaglowekTabeli();
     for(int i=0; i < iloscKontaktow; i++) {
@@ -134,7 +135,7 @@ void wyszukiwanieNazwiska(Kontakt kontakty[], string szukanaWartosc, int iloscKo
     komunikatOilosciZnalezionychKontaktow(iloscZnalezionychKontaktow, szukanaWartosc);
 }
 
-int wczytajKontaktyZPliku(Kontakt kontakty[]) {
+int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     string linia;
     int nr_lini = 1;
     int i = 0;
@@ -180,9 +181,8 @@ int wczytajKontaktyZPliku(Kontakt kontakty[]) {
     return i; //ilosc kontaktow
 }
 
-int main() {
-    const int MAKSYMALNA_ILOSC_KONTAKTOW = 999;
-    Kontakt kontakty[MAKSYMALNA_ILOSC_KONTAKTOW];
+int main(){
+    vector<Kontakt> kontakty(10);
 
     int iloscKontaktow = wczytajKontaktyZPliku(kontakty);
 
