@@ -137,7 +137,7 @@ void wyszukiwanieNazwiska(vector<Kontakt> &kontakty, string szukanaWartosc, int 
 
 int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     string linia;
-
+    Kontakt pojedynczyKontakt;
     int i = 0;
     size_t pozycjaZnakuOd =0;
     size_t pozycjaSeparatora;
@@ -156,32 +156,34 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
 
     while(getline(plik, linia)) {
         pozycjaSeparatora = linia.find("|");
-        kontakty[i].id = atoi(linia.substr(pozycjaZnakuOd, pozycjaSeparatora).c_str());
+        pojedynczyKontakt.id = atoi(linia.substr(pozycjaZnakuOd, pozycjaSeparatora).c_str());
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
         iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
-        kontakty[i].imie = linia.substr(pozycjaZnakuOd, iloscZnakow);
+        pojedynczyKontakt.imie = linia.substr(pozycjaZnakuOd, iloscZnakow);
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
         iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
-        kontakty[i].nazwisko = linia.substr(pozycjaZnakuOd, iloscZnakow);
+        pojedynczyKontakt.nazwisko = linia.substr(pozycjaZnakuOd, iloscZnakow);
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
         iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
-        kontakty[i].telefon = linia.substr(pozycjaZnakuOd, iloscZnakow);
+        pojedynczyKontakt.telefon = linia.substr(pozycjaZnakuOd, iloscZnakow);
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
         iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
-        kontakty[i].email = linia.substr(pozycjaZnakuOd, iloscZnakow);
+        pojedynczyKontakt.email = linia.substr(pozycjaZnakuOd, iloscZnakow);
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
         iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
-        kontakty[i].adres = linia.substr(pozycjaZnakuOd, iloscZnakow);
+        pojedynczyKontakt.adres = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        kontakty.push_back(pojedynczyKontakt);
 
         i++;
     }
@@ -190,7 +192,7 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
 }
 
 int main() {
-    vector<Kontakt> kontakty(10);
+    vector<Kontakt> kontakty;
 
     int iloscKontaktow = wczytajKontaktyZPliku(kontakty);
 
