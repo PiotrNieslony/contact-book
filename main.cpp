@@ -36,12 +36,12 @@ int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
         system("pause");
         return 0;
     }
-    plik << kontakty[iloscKontaktow].id << endl;
-    plik << kontakty[iloscKontaktow].imie << endl;
-    plik << kontakty[iloscKontaktow].nazwisko << endl;
-    plik << kontakty[iloscKontaktow].telefon << endl;
-    plik << kontakty[iloscKontaktow].email << endl;
-    plik << kontakty[iloscKontaktow].adres << endl;
+    plik << kontakty[iloscKontaktow].id << "|";
+    plik << kontakty[iloscKontaktow].imie << "|";
+    plik << kontakty[iloscKontaktow].nazwisko << "|";
+    plik << kontakty[iloscKontaktow].telefon << "|";
+    plik << kontakty[iloscKontaktow].email << "|";
+    plik << kontakty[iloscKontaktow].adres << "|" << endl;
     plik.close();
 
     iloscKontaktow++;
@@ -137,8 +137,12 @@ void wyszukiwanieNazwiska(vector<Kontakt> &kontakty, string szukanaWartosc, int 
 
 int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     string linia;
-    int nr_lini = 1;
+
     int i = 0;
+    size_t pozycjaZnakuOd =0;
+    size_t pozycjaSeparatora;
+    int iloscZnakow;
+
 
     fstream plik;
     plik.open("kontakty.txt",ios::in);
@@ -151,37 +155,41 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     }
 
     while(getline(plik, linia)) {
-        switch(nr_lini) {
-        case 1:
-            kontakty[i].imie = linia;
-            break;
-        case 2:
-            kontakty[i].nazwisko = linia;
-            break;
-        case 3:
-            kontakty[i].telefon = linia;
-            break;
-        case 4:
-            kontakty[i].email = linia;
-            break;
-        case 5:
-            kontakty[i].adres = linia;
-            break;
-        case 6:
-            kontakty[i].id = atoi(linia.c_str());
-            break;
-        }
-        nr_lini++;
-        if(nr_lini == 7) {
-            nr_lini = 1;
-            i++;
-        }
+        pozycjaSeparatora = linia.find("|");
+        kontakty[i].id = atoi(linia.substr(pozycjaZnakuOd, pozycjaSeparatora).c_str());
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        kontakty[i].imie = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        kontakty[i].nazwisko = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        kontakty[i].telefon = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        kontakty[i].email = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        kontakty[i].adres = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        i++;
     }
     plik.close();
     return i; //ilosc kontaktow
 }
 
-int main(){
+int main() {
     vector<Kontakt> kontakty(10);
 
     int iloscKontaktow = wczytajKontaktyZPliku(kontakty);
