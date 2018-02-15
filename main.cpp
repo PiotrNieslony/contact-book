@@ -11,7 +11,7 @@ struct Kontakt {
     string imie, nazwisko, telefon, email, adres;
 };
 
-int zapisywanieKontaktu(vector<Kontakt> &kontakty, unsigned int iloscKontaktow) {
+int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
     system("cls");
     Kontakt pojedynczyKontakt;
     if(iloscKontaktow == 0) pojedynczyKontakt.id = 0;
