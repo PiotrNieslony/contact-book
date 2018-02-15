@@ -11,10 +11,11 @@ struct Kontakt {
     string imie, nazwisko, telefon, email, adres;
 };
 
-int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
+int zapisywanieKontaktu(vector<Kontakt> &kontakty, unsigned int iloscKontaktow) {
     system("cls");
     Kontakt pojedynczyKontakt;
-    pojedynczyKontakt.id = kontakty[iloscKontaktow-1].id+1;
+    if(iloscKontaktow == 0) pojedynczyKontakt.id = 0;
+    else pojedynczyKontakt.id = kontakty[iloscKontaktow-1].id+1;
     cout << "Podaj imie: ";
     cin >> pojedynczyKontakt.imie;
     cout << "Podaj nazwisko: ";
@@ -364,8 +365,8 @@ int main() {
             break;
         case '2':
             system("cls");
-            cout << "EDYCJA:" << endl;
-            cout << "Co chcesz edytowac?:" << endl;
+            cout << "EDYCJA: " << endl << endl;
+            cout << "Co chcesz edytowac?: " << endl;
             cout << "1. Imie" << endl;
             cout << "2. Nazwisko" << endl;
             cout << "3. Telefon" << endl;
