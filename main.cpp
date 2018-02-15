@@ -112,6 +112,18 @@ void komunikatOilosciZnalezionychKontaktow(int iloscZnalezionychKontaktow, strin
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15); // bialy
 }
 
+void wyszukiwanieID(vector<Kontakt> &kontakty, int szukanaWartosc, int iloscKontaktow ) {
+
+    wyswietlNaglowekTabeli();
+    for(int i=0; i < iloscKontaktow; i++) {
+        if (kontakty[i].id == szukanaWartosc) {
+            wyswietlWierszTabeli(kontakty, i);
+            return;
+        }
+    }
+    wyswieltLinieOdzielajaca();
+}
+
 void wyszukiwanieImienia(vector<Kontakt> &kontakty, string szukanaWartosc, int iloscKontaktow ) {
     int iloscZnalezionychKontaktow = 0;
     wyswietlNaglowekTabeli();
@@ -220,9 +232,9 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     return i; //ilosc kontaktow
 }
 
-void komunikatPoprawnejEdycjiDanch() {
+void komunikatInformacyjny(string tekstDoWyswietlenia) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
-    cout << "Dane zostaly zmienione." << endl;
+    cout << tekstDoWyswietlenia << endl;
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);// bia³y
     Sleep(1900);
 }
@@ -237,35 +249,35 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cin >> nowaWartosc;
                 kontakty[i].imie = nowaWartosc;
                 zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
-                komunikatPoprawnejEdycjiDanch();
+                komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 2:
                 cout << "Wprowadz nazwisko: ";
                 cin >> nowaWartosc;
                 kontakty[i].nazwisko = nowaWartosc;
                 zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
-                komunikatPoprawnejEdycjiDanch();
+                komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 3:
                 cout << "Wprowadz telefon: ";
                 cin >> nowaWartosc;
                 kontakty[i].telefon = nowaWartosc;
                 zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
-                komunikatPoprawnejEdycjiDanch();
+                komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 4:
                 cout << "Wprowadz emial: ";
                 cin >> nowaWartosc;
                 kontakty[i].email = nowaWartosc;
                 zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
-                komunikatPoprawnejEdycjiDanch();
+                komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 5:
                 cout << "Wprowadz adres: ";
-                cin >> nowaWartosc;
-                kontakty[i].adres = nowaWartosc;
+                cin.sync();
+                getline(cin,kontakty[i].adres);
                 zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
-                komunikatPoprawnejEdycjiDanch();
+                komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 6:
                 cout << "Wprowadz imie: ";
@@ -281,15 +293,39 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cin >> nowaWartosc;
                 kontakty[i].email = nowaWartosc;
                 cout << "Wprowadz adres: ";
-                cin >> nowaWartosc;
-                kontakty[i].adres = nowaWartosc;
+                cin.sync();
+                getline(cin,kontakty[i].adres);
                 zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
-                komunikatPoprawnejEdycjiDanch();
+                komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             }
         }
     }
-    cout << "Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty" << endl;
+    komunikatInformacyjny("Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty");
+}
+
+int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int id) {
+    bool czyPodanoPoprawneID = false;
+    char wybor;
+    vector<Kontakt>::iterator koniec = kontakty.end();
+    for(vector<Kontakt>::iterator itr = kontakty.begin();
+            itr != koniec; ++itr) {
+        if((*itr).id == id) {
+            wyszukiwanieID(kontakty, (*itr).id, iloscKontaktow );
+            cout << endl << "Czy napewno chcesz usunąć wybrany kontakt?(T - tak, N - nie): ";
+            cin >> wybor;
+            if(wybor  == 't' || wybor  == 'T') {
+                kontakty.erase(itr);
+                iloscKontaktow--;
+                komunikatInformacyjny("Kontakt zostal usuniety.");
+            }
+            czyPodanoPoprawneID = true;
+            break;
+        }
+    }
+    if(!czyPodanoPoprawneID) komunikatInformacyjny("Kontakt o takim ID nie istnieje");
+    zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow);
+    return iloscKontaktow;
 }
 
 int main() {
@@ -305,7 +341,7 @@ int main() {
     while(true) {
         system("cls");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
-        cout << "KSIAZKA ADRESOWA v0.1" << endl;
+        cout << "KSIAZKA ADRESOWA v0.2" << endl;
         cout << "---------------------------" << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
         cout << "Ilosc zapisanych kontaktow: "<< iloscKontaktow << endl << endl;
@@ -318,6 +354,7 @@ int main() {
         cout << "5. Wyswietl wszystkie zapisane kontaky" << endl;
         cout << "9. Zakoncz program" << endl << endl;
         cout << "wybor: ";
+        cin.sync();
         cin >> wybor;
         cin.sync();
 
@@ -346,6 +383,12 @@ int main() {
             edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48);
             break;
         case '3':
+            system("cls");
+            cout << "Usuwanie:" << endl;
+            cout << "Podaj ID kontaktu ktory chcesz usunac: " << endl;
+            cin >> id;
+            system("cls");
+            iloscKontaktow = kasowanieKontaktu(kontakty, iloscKontaktow, id);
             break;
         case '4':
             system("cls");
