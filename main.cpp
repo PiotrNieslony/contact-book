@@ -341,7 +341,7 @@ int main() {
     while(true) {
         system("cls");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
-        cout << "KSIAZKA ADRESOWA v0.1" << endl;
+        cout << "KSIAZKA ADRESOWA v0.2" << endl;
         cout << "---------------------------" << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
         cout << "Ilosc zapisanych kontaktow: "<< iloscKontaktow << endl << endl;
