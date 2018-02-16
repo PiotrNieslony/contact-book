@@ -313,7 +313,7 @@ int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int id) {
             itr != koniec; ++itr) {
         if((*itr).id == id) {
             wyszukiwanieID(kontakty, (*itr).id, iloscKontaktow );
-            cout << endl << "Czy napewno chcesz usunąć wybrany kontakt?(T - tak, N - nie): ";
+            cout << endl << "Czy napewno chcesz usunc wybrany kontakt?(T - tak, N - nie): ";
             cin >> wybor;
             if(wybor  == 't' || wybor  == 'T') {
                 kontakty.erase(itr);
