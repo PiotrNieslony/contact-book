@@ -356,9 +356,9 @@ int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
     fstream plikUzytkownicy;
     plikUzytkownicy.open("Uzytkownicy.txt", ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
         system("pause");
         return 0;
     }
@@ -378,9 +378,9 @@ void zapiszWszystkichUzytkownikowDoPliku (vector<Uzytkownik> &uzytkownicy, int i
     fstream plikUzytkownicy;
     plikUzytkownicy.open("Uzytkownicy.txt", ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
         system("pause");
         return;
     }
@@ -444,9 +444,9 @@ int wczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
 
     plikUzytkownicy.open("Uzytkownicy.txt",ios::in);
     if(plikUzytkownicy.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem z odczytem kontaktow z plikUzytkownicyu." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
         system("pause");
         return 0;
     }
@@ -474,26 +474,30 @@ int wczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
     return iloscUzytkownikow;
 }
 
+void naglowekAplikacji () {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
+    cout << "KSIAZKA ADRESOWA v0.3" << endl;
+    cout << "---------------------------" << endl;
+}
+
 int main() {
     vector<Kontakt> kontakty;
-
     int iloscKontaktow = wczytajKontaktyZPliku(kontakty);
-
-    char wybor;
     int id;
 
     vector<Uzytkownik> uzytkownicy;
     int idzalogowanegoUzytkownika = 0;
     int iloscUzytkownikow = wczytywanieUzytkownikow(uzytkownicy);
 
+    char wybor;
+
+
     string szukanaWartosc;
 
     while(true) {
         if(idzalogowanegoUzytkownika == 0) {
             system("cls");
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
-            cout << "KSIAZKA ADRESOWA v0.3" << endl;
-            cout << "---------------------------" << endl;
+            naglowekAplikacji();
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
             cout << "Ilosc zarejestrowanych uzytkownikow: "<< iloscUzytkownikow << endl << endl;
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
@@ -511,9 +515,7 @@ int main() {
             }
         } else {
             system("cls");
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
-            cout << "KSIAZKA ADRESOWA v0.3" << endl;
-            cout << "---------------------------" << endl;
+            naglowekAplikacji();
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
             cout << "Ilosc zapisanych kontaktow: "<< iloscKontaktow << endl << endl;
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
@@ -592,7 +594,7 @@ int main() {
                 wyswietlanieWszystkichKontaktow(kontakty, iloscKontaktow);
                 system("pause");
                 break;
-            case '8': {
+            case  '8':
                 system("cls");
                 cout << "1. Zmiana hasla" << endl;
                 cout << "2. Wylogowywanie" << endl;
@@ -605,8 +607,7 @@ int main() {
                 } else if(wybor == '9') {
                     break;
                 }
-            }
-            break;
+                break;
             case  '9':
                 exit(0);
                 break;
