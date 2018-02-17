@@ -329,6 +329,151 @@ int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int id) {
     return iloscKontaktow;
 }
 
+struct Uzytkownik {
+    int id;
+    string nazwa, haslo;
+};
+
+int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
+    string nazwa, haslo;
+    Uzytkownik pojedynczyUzytkownik;
+    cout << "Podaj nazwe uzytkownika: ";
+    cin >> nazwa;
+    for (int i=0; i<iloscUzytkownikow; i++) {
+        if (uzytkownicy[i].nazwa == nazwa) {
+            cout << "Taki uzytkownik istnieje. Wpis inna nazwe uzytkownika: ";
+            cin >> nazwa;
+            i = 0;
+        }
+    }
+    cout << "Podaj haslo: ";
+    cin >> haslo;
+    pojedynczyUzytkownik.nazwa = nazwa;
+    pojedynczyUzytkownik.haslo = haslo;
+    pojedynczyUzytkownik.id = iloscUzytkownikow+1;
+    uzytkownicy.push_back(pojedynczyUzytkownik);
+
+    fstream plikUzytkownicy;
+    plikUzytkownicy.open("Uzytkownicy.txt", ios::out | ios::app);
+    if(plikUzytkownicy.good() == false) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        system("pause");
+        return 0;
+    }
+
+    plikUzytkownicy << pojedynczyUzytkownik.id << "|";
+    plikUzytkownicy << pojedynczyUzytkownik.nazwa << "|";
+    plikUzytkownicy << pojedynczyUzytkownik.haslo << "|" << endl;
+    plikUzytkownicy.close();
+
+    cout << "Konto zalozone" << endl;
+    Sleep(1000);
+    return iloscUzytkownikow + 1;
+}
+
+void zapiszWszystkichUzytkownikowDoPliku (vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
+    remove("Uzytkownicy.txt");
+    fstream plikUzytkownicy;
+    plikUzytkownicy.open("Uzytkownicy.txt", ios::out | ios::app);
+    if(plikUzytkownicy.good() == false) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        system("pause");
+        return;
+    }
+    for (int i = 0; i < iloscUzytkownikow; i++) {
+        plikUzytkownicy << uzytkownicy[i].id << "|";
+        plikUzytkownicy << uzytkownicy[i].nazwa << "|";
+        plikUzytkownicy << uzytkownicy[i].haslo << "|" << endl;
+    }
+    plikUzytkownicy.close();
+}
+
+int logowanie(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
+    string nazwa, haslo;
+    cout << "Podaj nazwe:  ";
+    cin >> nazwa;
+    for (int i=0; i<iloscUzytkownikow; i++) {
+        if (uzytkownicy[i].nazwa == nazwa) {
+            for(int j=3; j>0; j--) {
+                cout << "Podaj haslo. pozostalo prob " << j << ": ";
+                cin >> haslo;
+                if (uzytkownicy[i].haslo == haslo) {
+                    cout << "Zalogowales sie" << endl;
+                    Sleep(1000);
+                    return uzytkownicy[i].id;
+                }
+            }
+            cout << "podales 3 razy bledne haslo, odczeka 3s" << endl;
+            Sleep(3000);
+            return 0;
+        }
+
+    }
+    cout << "Nie ma uzytkownika: " << nazwa << " ";
+    Sleep(1500);
+    return 0;
+    Sleep(1500);
+}
+
+void zmianaHasla(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow, int idZalogowanegoUzytkownika) {
+    string haslo;
+    cout << "podaj nowe haslo: ";
+    cin >> haslo;
+    for(int i=0; i<iloscUzytkownikow; i++) {
+        if(uzytkownicy[i].id == idZalogowanegoUzytkownika) {
+            uzytkownicy[i].haslo = haslo;
+            cout << "Haslo zostalo zmienione" << endl;
+            Sleep(1500);
+        }
+    }
+    zapiszWszystkichUzytkownikowDoPliku (uzytkownicy, iloscUzytkownikow);
+}
+
+int wczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
+    int iloscUzytkownikow = 0;
+    string linia;
+    Uzytkownik pojedynczyUzytkownik;
+    fstream plikUzytkownicy;
+    size_t pozycjaZnakuOd;
+    size_t pozycjaSeparatora;
+    int iloscZnakow;
+
+    plikUzytkownicy.open("Uzytkownicy.txt",ios::in);
+    if(plikUzytkownicy.good() == false) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        cout << "Wystapil problem z odczytem kontaktow z plikUzytkownicyu." << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        system("pause");
+        return 0;
+    }
+
+    while(getline(plikUzytkownicy, linia)) {
+
+        pozycjaSeparatora = linia.find("|");
+        pojedynczyUzytkownik.id = atoi(linia.substr(0, pozycjaSeparatora).c_str());
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        pojedynczyUzytkownik.nazwa = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        pojedynczyUzytkownik.haslo = linia.substr(pozycjaZnakuOd, iloscZnakow);
+
+        uzytkownicy.push_back(pojedynczyUzytkownik);
+
+        iloscUzytkownikow++;
+    }
+    plikUzytkownicy.close();
+    return iloscUzytkownikow;
+}
+
 int main() {
     vector<Kontakt> kontakty;
 
@@ -337,99 +482,141 @@ int main() {
     char wybor;
     int id;
 
+    vector<Uzytkownik> uzytkownicy;
+    int idzalogowanegoUzytkownika = 0;
+    int iloscUzytkownikow = wczytywanieUzytkownikow(uzytkownicy);
+
     string szukanaWartosc;
 
     while(true) {
-        system("cls");
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
-        cout << "KSIAZKA ADRESOWA v0.2" << endl;
-        cout << "---------------------------" << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
-        cout << "Ilosc zapisanych kontaktow: "<< iloscKontaktow << endl << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        cout << "MENU GLOWNE: "<< endl;
-        cout << "1. Dodaj nowy kontakt" << endl;
-        cout << "2. Edytuj kontakt" << endl;
-        cout << "3. Usun kontakt" << endl;
-        cout << "4. Znajdz kontakt" << endl;
-        cout << "5. Wyswietl wszystkie zapisane kontaky" << endl;
-        cout << "9. Zakoncz program" << endl << endl;
-        cout << "wybor: ";
-        cin.sync();
-        cin >> wybor;
-        cin.sync();
+        if(idzalogowanegoUzytkownika == 0) {
+            system("cls");
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
+            cout << "KSIAZKA ADRESOWA v0.3" << endl;
+            cout << "---------------------------" << endl;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
+            cout << "Ilosc zarejestrowanych uzytkownikow: "<< iloscUzytkownikow << endl << endl;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+            cout << "1. Rejestracja" << endl;
+            cout << "2. Logownaie" << endl;
+            cout << "9. Zakoncz program" << endl;
+            cin >> wybor;
 
-        switch(wybor) {
-        case '1':
-            iloscKontaktow = zapisywanieKontaktu(kontakty, iloscKontaktow);
-            break;
-        case '2':
-            system("cls");
-            cout << "EDYCJA: " << endl << endl;
-            cout << "Co chcesz edytowac?: " << endl;
-            cout << "1. Imie" << endl;
-            cout << "2. Nazwisko" << endl;
-            cout << "3. Telefon" << endl;
-            cout << "4. Email" << endl;
-            cout << "5. Adres" << endl;
-            cout << "6. Wszystko" << endl;
-            cout << "9. Nic" << endl << endl;
-            cout << "wybor: ";
-            cin >> wybor;
-            system("cls");
-            if (wybor == '9') break;
-            cout << "EDYCJA:" << endl;
-            cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
-            cin >> id;
-            edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48);
-            break;
-        case '3':
-            system("cls");
-            cout << "Usuwanie:" << endl;
-            cout << "Podaj ID kontaktu ktory chcesz usunac: " << endl;
-            cin >> id;
-            system("cls");
-            iloscKontaktow = kasowanieKontaktu(kontakty, iloscKontaktow, id);
-            break;
-        case '4':
-            system("cls");
-            cout << "WYSZUKIWANIE:" << endl;
-            cout << "1. Wyszukaj imie" << endl;
-            cout << "2. Wyszukaj nazwisko" << endl;
-            cout << "9. Menu glowne" << endl << endl;
-            cout << "wybor: ";
-            cin >> wybor;
-            if (wybor == '1') {
-                system("cls");
-                cout << "Podaj szukane Imie: ";
-                cin >> szukanaWartosc;
-                wyszukiwanieImienia(kontakty, szukanaWartosc, iloscKontaktow );
-                system("pause");
+            if(wybor == '1') {
+                iloscUzytkownikow = rejestracja(uzytkownicy, iloscUzytkownikow);
             } else if(wybor == '2') {
-                system("cls");
-                cout << "Podaj szukane nazwisko: ";
-                cin >> szukanaWartosc;
-                wyszukiwanieNazwiska(kontakty, szukanaWartosc, iloscKontaktow );
-                system("pause");
+                idzalogowanegoUzytkownika = logowanie(uzytkownicy, iloscUzytkownikow);
             } else if(wybor == '9') {
+                exit(0);
+            }
+        } else {
+            system("cls");
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
+            cout << "KSIAZKA ADRESOWA v0.3" << endl;
+            cout << "---------------------------" << endl;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
+            cout << "Ilosc zapisanych kontaktow: "<< iloscKontaktow << endl << endl;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+            cout << "MENU GLOWNE: "<< endl;
+            cout << "1. Dodaj nowy kontakt" << endl;
+            cout << "2. Edytuj kontakt" << endl;
+            cout << "3. Usun kontakt" << endl;
+            cout << "4. Znajdz kontakt" << endl;
+            cout << "5. Wyswietl wszystkie zapisane kontaky" << endl;
+            cout << "8. Uzytkownik" << endl;
+            cout << "9. Zakoncz program" << endl << endl;
+            cout << "wybor: ";
+            cin.sync();
+            cin >> wybor;
+            cin.sync();
+
+            switch(wybor) {
+            case '1':
+                iloscKontaktow = zapisywanieKontaktu(kontakty, iloscKontaktow);
+                break;
+            case '2':
+                system("cls");
+                cout << "EDYCJA: " << endl << endl;
+                cout << "Co chcesz edytowac?: " << endl;
+                cout << "1. Imie" << endl;
+                cout << "2. Nazwisko" << endl;
+                cout << "3. Telefon" << endl;
+                cout << "4. Email" << endl;
+                cout << "5. Adres" << endl;
+                cout << "6. Wszystko" << endl;
+                cout << "9. Nic" << endl << endl;
+                cout << "wybor: ";
+                cin >> wybor;
+                system("cls");
+                if (wybor == '9') break;
+                cout << "EDYCJA:" << endl;
+                cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
+                cin >> id;
+                edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48);
+                break;
+            case '3':
+                system("cls");
+                cout << "Usuwanie:" << endl;
+                cout << "Podaj ID kontaktu ktory chcesz usunac: " << endl;
+                cin >> id;
+                system("cls");
+                iloscKontaktow = kasowanieKontaktu(kontakty, iloscKontaktow, id);
+                break;
+            case '4':
+                system("cls");
+                cout << "WYSZUKIWANIE:" << endl;
+                cout << "1. Wyszukaj imie" << endl;
+                cout << "2. Wyszukaj nazwisko" << endl;
+                cout << "9. Menu glowne" << endl << endl;
+                cout << "wybor: ";
+                cin >> wybor;
+                if (wybor == '1') {
+                    system("cls");
+                    cout << "Podaj szukane Imie: ";
+                    cin >> szukanaWartosc;
+                    wyszukiwanieImienia(kontakty, szukanaWartosc, iloscKontaktow );
+                    system("pause");
+                } else if(wybor == '2') {
+                    system("cls");
+                    cout << "Podaj szukane nazwisko: ";
+                    cin >> szukanaWartosc;
+                    wyszukiwanieNazwiska(kontakty, szukanaWartosc, iloscKontaktow );
+                    system("pause");
+                } else if(wybor == '9') {
+                    break;
+                }
+
+                break;
+            case '5':
+                system("cls");
+                wyswietlanieWszystkichKontaktow(kontakty, iloscKontaktow);
+                system("pause");
+                break;
+            case '8': {
+                system("cls");
+                cout << "1. Zmiana hasla" << endl;
+                cout << "2. Wylogowywanie" << endl;
+                cout << "9. Menu glowne" << endl;
+                cin >> wybor;
+                if(wybor == '1') {
+                    zmianaHasla(uzytkownicy, iloscUzytkownikow, idzalogowanegoUzytkownika);
+                } else if(wybor == '2') {
+                    idzalogowanegoUzytkownika = 0;
+                } else if(wybor == '9') {
+                    break;
+                }
+            }
+            break;
+            case  '9':
+                exit(0);
+                break;
+            default:
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
+                cout << "Nie ma takiej opcji w menu";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+                Sleep(1500);
                 break;
             }
-
-            break;
-        case '5':
-            system("cls");
-            wyswietlanieWszystkichKontaktow(kontakty, iloscKontaktow);
-            system("pause");
-            break;
-        case  '9':
-            exit(0);
-            break;
-        default:
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
-            cout << "Nie ma takiej opcji w menu";
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-            Sleep(1500);
-            break;
         }
     }
 }
