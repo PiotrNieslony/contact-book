@@ -11,7 +11,10 @@ struct Kontakt {
     string imie, nazwisko, telefon, email, adres;
 };
 
-int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
+string plikZKontaktami = "kontakty.txt";
+string plikZDanymiUzytkownikow = "Uzytkownicy.txt";
+
+int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idZalogowanegoUzytkownika) {
     system("cls");
     Kontakt pojedynczyKontakt;
     if(iloscKontaktow == 0) pojedynczyKontakt.id = 0;
@@ -40,7 +43,9 @@ int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow) {
         system("pause");
         return 0;
     }
+
     plik << pojedynczyKontakt.id << "|";
+    plik << idZalogowanegoUzytkownika << "|";
     plik << pojedynczyKontakt.imie << "|";
     plik << pojedynczyKontakt.nazwisko << "|";
     plik << pojedynczyKontakt.telefon << "|";
@@ -151,14 +156,14 @@ void wyszukiwanieNazwiska(vector<Kontakt> &kontakty, string szukanaWartosc, int 
     komunikatOilosciZnalezionychKontaktow(iloscZnalezionychKontaktow, szukanaWartosc);
 }
 
-void zapiszWszystkieKontaktyDoPliku(vector<Kontakt> &kontakty, int iloscKontaktow) {
+void zapiszWszystkieKontaktyDoPliku(vector<Kontakt> &kontakty, int iloscKontaktow, int idZalogowanegoUzytkownika) {
     remove("kontakty-kopia.txt");
-    if((rename("kontakty.txt", "kontakty-kopia.txt")) != 0) {
+    if((rename(plikZKontaktami.c_str(), "kontakty-kopia.txt")) != 0) {
         cout << ( "Blad przy tworzeniu kopii pliku" ) << endl;
         return;
     }
     fstream plik;
-    plik.open("kontakty.txt", ios::out | ios::app);
+    plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
     if(plik.good() == false) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
@@ -167,6 +172,7 @@ void zapiszWszystkieKontaktyDoPliku(vector<Kontakt> &kontakty, int iloscKontakto
         return;
     }
     for(int i = 0; i < iloscKontaktow; i++) {
+        plik << idZalogowanegoUzytkownika << "|";
         plik << kontakty[i].id << "|";
         plik << kontakty[i].imie << "|";
         plik << kontakty[i].nazwisko << "|";
@@ -177,16 +183,17 @@ void zapiszWszystkieKontaktyDoPliku(vector<Kontakt> &kontakty, int iloscKontakto
     plik.close();
 }
 
-int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
+int wczytajKontaktyZPliku(vector<Kontakt> &kontakty, int idZalogowanegoUzytkownika) {
     string linia;
     Kontakt pojedynczyKontakt;
     int i = 0;
     size_t pozycjaZnakuOd;
     size_t pozycjaSeparatora;
     int iloscZnakow;
+    int idWlascicielaKontaktu;
 
     fstream plik;
-    plik.open("kontakty.txt",ios::in);
+    plik.open(plikZKontaktami.c_str(),ios::in);
     if(plik.good() == false) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem z odczytem kontaktow z pliku." << endl;
@@ -198,7 +205,14 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty) {
     while(getline(plik, linia)) {
 
         pozycjaSeparatora = linia.find("|");
-        pojedynczyKontakt.id = atoi(linia.substr(0, pozycjaSeparatora).c_str());
+         pojedynczyKontakt.id = atoi(linia.substr(0, pozycjaSeparatora).c_str());
+        if(idWlascicielaKontaktu != idZalogowanegoUzytkownika) continue;
+
+        pozycjaZnakuOd = pozycjaSeparatora+1;
+        pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
+        iloscZnakow = pozycjaSeparatora - pozycjaZnakuOd;
+        idWlascicielaKontaktu = atoi(linia.substr(pozycjaZnakuOd, iloscZnakow).c_str());
+        if(idWlascicielaKontaktu != idZalogowanegoUzytkownika) continue;
 
         pozycjaZnakuOd = pozycjaSeparatora+1;
         pozycjaSeparatora = linia.find("|",pozycjaZnakuOd);
@@ -240,7 +254,7 @@ void komunikatInformacyjny(string tekstDoWyswietlenia) {
     Sleep(1900);
 }
 
-void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id, int poleDoEdycji) {
+void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id, int poleDoEdycji, int idZalogowanegoUzytkownika) {
     string nowaWartosc;
     for(int i = 0; i < iloscKontaktow; i++) {
         if(kontakty[i].id == id) {
@@ -249,35 +263,35 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cout << "Wprowadz imie: ";
                 cin >> nowaWartosc;
                 kontakty[i].imie = nowaWartosc;
-                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 2:
                 cout << "Wprowadz nazwisko: ";
                 cin >> nowaWartosc;
                 kontakty[i].nazwisko = nowaWartosc;
-                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 3:
                 cout << "Wprowadz telefon: ";
                 cin >> nowaWartosc;
                 kontakty[i].telefon = nowaWartosc;
-                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 4:
                 cout << "Wprowadz emial: ";
                 cin >> nowaWartosc;
                 kontakty[i].email = nowaWartosc;
-                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 5:
                 cout << "Wprowadz adres: ";
                 cin.sync();
                 getline(cin,kontakty[i].adres);
-                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             case 6:
@@ -296,7 +310,7 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cout << "Wprowadz adres: ";
                 cin.sync();
                 getline(cin,kontakty[i].adres);
-                zapiszWszystkieKontaktyDoPliku(kontakty,iloscKontaktow);
+                zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 komunikatInformacyjny("Dane zostaly zmienione.");
                 return;
             }
@@ -305,7 +319,7 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
     komunikatInformacyjny("Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty");
 }
 
-int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int id) {
+int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int id, int idZalogowanegoUzytkownika) {
     bool czyPodanoPoprawneID = false;
     char wybor;
     vector<Kontakt>::iterator koniec = kontakty.end();
@@ -325,7 +339,7 @@ int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int id) {
         }
     }
     if(!czyPodanoPoprawneID) komunikatInformacyjny("Kontakt o takim ID nie istnieje");
-    zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow);
+    zapiszWszystkieKontaktyDoPliku(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
     return iloscKontaktow;
 }
 
@@ -354,7 +368,7 @@ int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
     uzytkownicy.push_back(pojedynczyUzytkownik);
 
     fstream plikUzytkownicy;
-    plikUzytkownicy.open("Uzytkownicy.txt", ios::out | ios::app);
+    plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
         //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
@@ -374,9 +388,9 @@ int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
 }
 
 void zapiszWszystkichUzytkownikowDoPliku (vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
-    remove("Uzytkownicy.txt");
+    remove(plikZDanymiUzytkownikow.c_str());
     fstream plikUzytkownicy;
-    plikUzytkownicy.open("Uzytkownicy.txt", ios::out | ios::app);
+    plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
         //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
@@ -442,7 +456,7 @@ int wczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
     size_t pozycjaSeparatora;
     int iloscZnakow;
 
-    plikUzytkownicy.open("Uzytkownicy.txt",ios::in);
+    plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(),ios::in);
     if(plikUzytkownicy.good() == false) {
         //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem z odczytem kontaktow z plikUzytkownicyu." << endl;
@@ -482,11 +496,11 @@ void naglowekAplikacji () {
 
 int main() {
     vector<Kontakt> kontakty;
-    int iloscKontaktow = wczytajKontaktyZPliku(kontakty);
+    int iloscKontaktow;
     int id;
 
     vector<Uzytkownik> uzytkownicy;
-    int idzalogowanegoUzytkownika = 0;
+    int idZalogowanegoUzytkownika = 0;
     int iloscUzytkownikow = wczytywanieUzytkownikow(uzytkownicy);
 
     char wybor;
@@ -495,7 +509,7 @@ int main() {
     string szukanaWartosc;
 
     while(true) {
-        if(idzalogowanegoUzytkownika == 0) {
+        if(idZalogowanegoUzytkownika == 0) {
             system("cls");
             naglowekAplikacji();
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
@@ -509,7 +523,8 @@ int main() {
             if(wybor == '1') {
                 iloscUzytkownikow = rejestracja(uzytkownicy, iloscUzytkownikow);
             } else if(wybor == '2') {
-                idzalogowanegoUzytkownika = logowanie(uzytkownicy, iloscUzytkownikow);
+                idZalogowanegoUzytkownika = logowanie(uzytkownicy, iloscUzytkownikow);
+                if (idZalogowanegoUzytkownika) iloscKontaktow = wczytajKontaktyZPliku(kontakty, idZalogowanegoUzytkownika);
             } else if(wybor == '9') {
                 exit(0);
             }
@@ -534,7 +549,7 @@ int main() {
 
             switch(wybor) {
             case '1':
-                iloscKontaktow = zapisywanieKontaktu(kontakty, iloscKontaktow);
+                iloscKontaktow = zapisywanieKontaktu(kontakty, iloscKontaktow, idZalogowanegoUzytkownika);
                 break;
             case '2':
                 system("cls");
@@ -554,7 +569,7 @@ int main() {
                 cout << "EDYCJA:" << endl;
                 cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
                 cin >> id;
-                edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48);
+                edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48, idZalogowanegoUzytkownika);
                 break;
             case '3':
                 system("cls");
@@ -562,7 +577,7 @@ int main() {
                 cout << "Podaj ID kontaktu ktory chcesz usunac: " << endl;
                 cin >> id;
                 system("cls");
-                iloscKontaktow = kasowanieKontaktu(kontakty, iloscKontaktow, id);
+                iloscKontaktow = kasowanieKontaktu(kontakty, iloscKontaktow, id, idZalogowanegoUzytkownika);
                 break;
             case '4':
                 system("cls");
@@ -601,9 +616,9 @@ int main() {
                 cout << "9. Menu glowne" << endl;
                 cin >> wybor;
                 if(wybor == '1') {
-                    zmianaHasla(uzytkownicy, iloscUzytkownikow, idzalogowanegoUzytkownika);
+                    zmianaHasla(uzytkownicy, iloscUzytkownikow, idZalogowanegoUzytkownika);
                 } else if(wybor == '2') {
-                    idzalogowanegoUzytkownika = 0;
+                    idZalogowanegoUzytkownika = 0;
                 } else if(wybor == '9') {
                     break;
                 }
