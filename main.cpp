@@ -11,7 +11,7 @@ struct Kontakt {
     string imie, nazwisko, telefon, email, adres;
 };
 
-string plikZKontaktami = "kontakty.txt";
+string plikZKontaktami = "Adresaci.txt";
 string plikZDanymiUzytkownikow = "Uzytkownicy.txt";
 
 int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idZalogowanegoUzytkownika, int idOstatniegoZapisanegoKontaktu) {
@@ -34,7 +34,7 @@ int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idZal
     kontakty.push_back(pojedynczyKontakt);
 
     fstream plik;
-    plik.open("kontakty.txt", ios::out | ios::app);
+    plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
     if(plik.good() == false) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
@@ -115,16 +115,17 @@ void komunikatOilosciZnalezionychKontaktow(int iloscZnalezionychKontaktow, strin
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15); // bialy
 }
 
-void wyszukiwanieID(vector<Kontakt> &kontakty, int szukanaWartosc, int iloscKontaktow ) {
+bool wyszukiwanieID(vector<Kontakt> &kontakty, int szukanaWartosc, int iloscKontaktow ) {
 
     wyswietlNaglowekTabeli();
     for(int i=0; i < iloscKontaktow; i++) {
         if (kontakty[i].id == szukanaWartosc) {
             wyswietlWierszTabeli(kontakty, i);
-            return;
+            return true;
         }
     }
     wyswieltLinieOdzielajaca();
+    return false;
 }
 
 void wyszukiwanieImienia(vector<Kontakt> &kontakty, string szukanaWartosc, int iloscKontaktow ) {
@@ -215,7 +216,7 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty, int idZalogowanegoUzytkowni
     return idOstatniegoZapisanegoKontaktu;
 }
 
-void komunikatInformacyjny(string tekstDoWyswietlenia) {
+void wyswietlKomunikatNeutralny(string tekstDoWyswietlenia) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
     cout << tekstDoWyswietlenia << endl;
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);// bia³y
@@ -273,35 +274,35 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cin >> nowaWartosc;
                 kontakty[i].imie = nowaWartosc;
                 zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
-                komunikatInformacyjny("Dane zostaly zmienione.");
+                wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 2:
                 cout << "Wprowadz nazwisko: ";
                 cin >> nowaWartosc;
                 kontakty[i].nazwisko = nowaWartosc;
                 zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
-                komunikatInformacyjny("Dane zostaly zmienione.");
+                wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 3:
                 cout << "Wprowadz telefon: ";
                 cin >> nowaWartosc;
                 kontakty[i].telefon = nowaWartosc;
                 zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
-                komunikatInformacyjny("Dane zostaly zmienione.");
+                wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 4:
                 cout << "Wprowadz emial: ";
                 cin >> nowaWartosc;
                 kontakty[i].email = nowaWartosc;
                 zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
-                komunikatInformacyjny("Dane zostaly zmienione.");
+                wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 5:
                 cout << "Wprowadz adres: ";
                 cin.sync();
                 getline(cin,kontakty[i].adres);
                 zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
-                komunikatInformacyjny("Dane zostaly zmienione.");
+                wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 6:
                 cout << "Wprowadz imie: ";
@@ -320,12 +321,12 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cin.sync();
                 getline(cin,kontakty[i].adres);
                 zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
-                komunikatInformacyjny("Dane zostaly zmienione.");
+                wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             }
         }
     }
-    komunikatInformacyjny("Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty");
+    wyswietlKomunikatNeutralny("Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty");
 }
 
 void usunKontaktZPliku(int idKontaktuDoUsuniececia) {
@@ -374,14 +375,14 @@ int kasowanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idKonta
             if(wybor  == 't' || wybor  == 'T') {
                 kontakty.erase(itr);
                 usunKontaktZPliku(idKontaktuDoUsuniececia);
-                komunikatInformacyjny("Kontakt zostal usuniety.");
+                wyswietlKomunikatNeutralny("Kontakt zostal usuniety.");
                 return iloscKontaktow - 1;
             }
             czyPodanoPoprawneID = true;
             break;
         }
     }
-    if(!czyPodanoPoprawneID) komunikatInformacyjny("Kontakt o takim ID nie istnieje");
+    if(!czyPodanoPoprawneID) wyswietlKomunikatNeutralny("Kontakt o takim ID nie istnieje");
     return iloscKontaktow;
 }
 
@@ -597,6 +598,11 @@ int main() {
                 break;
             case '2':
                 system("cls");
+                cout << "EDYCJA:" << endl;
+                cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
+                cin >> id;
+                system("cls");
+                if (wyszukiwanieID(kontakty, id, iloscKontaktow)){
                 cout << "EDYCJA: " << endl << endl;
                 cout << "Co chcesz edytowac?: " << endl;
                 cout << "1. Imie" << endl;
@@ -608,12 +614,13 @@ int main() {
                 cout << "9. Nic" << endl << endl;
                 cout << "wybor: ";
                 cin >> wybor;
-                system("cls");
+                cin.sync();
                 if (wybor == '9') break;
-                cout << "EDYCJA:" << endl;
-                cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
-                cin >> id;
                 edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48, idZalogowanegoUzytkownika);
+                } else {
+                    system("cls");
+                    wyswietlKomunikatNeutralny("Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty");
+                }
                 break;
             case '3':
                 system("cls");
@@ -631,6 +638,7 @@ int main() {
                 cout << "9. Menu glowne" << endl << endl;
                 cout << "wybor: ";
                 cin >> wybor;
+                cin.sync();
                 if (wybor == '1') {
                     system("cls");
                     cout << "Podaj szukane Imie: ";
