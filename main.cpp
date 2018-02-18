@@ -223,20 +223,21 @@ void wyswietlKomunikatNeutralny(string tekstDoWyswietlenia) {
     Sleep(1900);
 }
 
-void zapiszZmienionyKontaktWPliku(Kontakt pojedynczyKontakt, int idZalogowanegoUzytkownika){
+void zapiszZmienionyKontaktDoPliku(Kontakt pojedynczyKontakt, int idZalogowanegoUzytkownika){
     string linia;
     size_t pozycjaSeparatora;
     int idKontaktu;
     int i = 0;
-    remove("kontakty-kopia.txt");
-    if((rename(plikZKontaktami.c_str(), "kontakty-kopia.txt")) != 0) {
+    string kopiaPlikuZKontaktami = "." + plikZKontaktami;
+    remove(kopiaPlikuZKontaktami.c_str());
+    if((rename(plikZKontaktami.c_str(), kopiaPlikuZKontaktami.c_str())) != 0) {
         cout << ( "Blad przy tworzeniu kopii pliku" ) << endl;
         return;
     }
     fstream plik;
     fstream plikKopia;
     plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
-    plikKopia.open("kontakty-kopia.txt",ios::in);
+    plikKopia.open(kopiaPlikuZKontaktami.c_str(),ios::in);
     if(plik.good() == false || plikKopia.good() == false) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
@@ -273,35 +274,35 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cout << "Wprowadz imie: ";
                 cin >> nowaWartosc;
                 kontakty[i].imie = nowaWartosc;
-                zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
+                zapiszZmienionyKontaktDoPliku(kontakty[i],  idZalogowanegoUzytkownika);
                 wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 2:
                 cout << "Wprowadz nazwisko: ";
                 cin >> nowaWartosc;
                 kontakty[i].nazwisko = nowaWartosc;
-                zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
+                zapiszZmienionyKontaktDoPliku(kontakty[i],  idZalogowanegoUzytkownika);
                 wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 3:
                 cout << "Wprowadz telefon: ";
-                cin >> nowaWartosc;
-                kontakty[i].telefon = nowaWartosc;
-                zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
+                cin.sync();
+                getline(cin,kontakty[i].telefon);
+                zapiszZmienionyKontaktDoPliku(kontakty[i],  idZalogowanegoUzytkownika);
                 wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 4:
                 cout << "Wprowadz emial: ";
                 cin >> nowaWartosc;
                 kontakty[i].email = nowaWartosc;
-                zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
+                zapiszZmienionyKontaktDoPliku(kontakty[i],  idZalogowanegoUzytkownika);
                 wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 5:
                 cout << "Wprowadz adres: ";
                 cin.sync();
                 getline(cin,kontakty[i].adres);
-                zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
+                zapiszZmienionyKontaktDoPliku(kontakty[i],  idZalogowanegoUzytkownika);
                 wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             case 6:
@@ -320,7 +321,7 @@ void edytujDaneKontaktowe(vector<Kontakt> &kontakty, int iloscKontaktow, int id,
                 cout << "Wprowadz adres: ";
                 cin.sync();
                 getline(cin,kontakty[i].adres);
-                zapiszZmienionyKontaktWPliku(kontakty[i],  idZalogowanegoUzytkownika);
+                zapiszZmienionyKontaktDoPliku(kontakty[i],  idZalogowanegoUzytkownika);
                 wyswietlKomunikatNeutralny("Dane zostaly zmienione.");
                 return;
             }
@@ -333,9 +334,10 @@ void usunKontaktZPliku(int idKontaktuDoUsuniececia) {
     string linia;
     size_t pozycjaSeparatora;
     int idKontaktu;
+    string kopiaPlikuZKontaktami = "." + plikZKontaktami;
 
-    remove("kontakty-kopia.txt");
-    if((rename(plikZKontaktami.c_str(), "kontakty-kopia.txt")) != 0) {
+    remove(kopiaPlikuZKontaktami.c_str());
+    if((rename(plikZKontaktami.c_str(), kopiaPlikuZKontaktami.c_str())) != 0) {
         cout << ( "Blad przy tworzeniu kopii pliku" ) << endl;
         return;
     }
@@ -343,7 +345,7 @@ void usunKontaktZPliku(int idKontaktuDoUsuniececia) {
     fstream plik;
     fstream plikKopia;
     plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
-    plikKopia.open("kontakty-kopia.txt",ios::in);
+    plikKopia.open(kopiaPlikuZKontaktami.c_str(),ios::in);
     if(plik.good() == false || plikKopia.good() == false) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
