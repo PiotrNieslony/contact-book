@@ -14,6 +14,27 @@ struct Kontakt {
 string plikZKontaktami = "Adresaci.txt";
 string plikZDanymiUzytkownikow = "Uzytkownicy.txt";
 
+void wyswietlKomunikatNeutralny(string tekstDoWyswietlenia) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
+    cout << tekstDoWyswietlenia << endl;
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);// bia³y
+    Sleep(1900);
+}
+
+void wyswietlKomunikatKrytyczny(string tekstDoWyswietlenia) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12);// zielony
+    cout << tekstDoWyswietlenia << endl;
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+    system("pause");
+}
+
+void wyswietlKomunikatOstrzegawczy(string tekstDoWyswietlenia) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
+    cout << tekstDoWyswietlenia;
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+    Sleep(1500);
+}
+
 int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idZalogowanegoUzytkownika, int idOstatniegoZapisanegoKontaktu) {
     system("cls");
     Kontakt pojedynczyKontakt;
@@ -36,10 +57,7 @@ int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idZal
     fstream plik;
     plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
     if(plik.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        system("pause");
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku." );
         return 0;
     }
 
@@ -53,10 +71,7 @@ int zapisywanieKontaktu(vector<Kontakt> &kontakty, int iloscKontaktow, int idZal
     plik.close();
 
     system("cls");
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
-    cout << "Super, dodales nowe dane kontaktowe.";
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);// bia³y
-    Sleep(1900);
+    wyswietlKomunikatNeutralny("Super, dodales nowe dane kontaktowe.");
     return pojedynczyKontakt.id;
 }
 
@@ -167,10 +182,7 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty, int idZalogowanegoUzytkowni
     fstream plik;
     plik.open(plikZKontaktami.c_str(),ios::in);
     if(plik.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem z odczytem kontaktow z pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        system("pause");
+        wyswietlKomunikatKrytyczny("Wystapil problem z odczytem kontaktow z pliku.");
         return 0;
     }
 
@@ -216,14 +228,7 @@ int wczytajKontaktyZPliku(vector<Kontakt> &kontakty, int idZalogowanegoUzytkowni
     return idOstatniegoZapisanegoKontaktu;
 }
 
-void wyswietlKomunikatNeutralny(string tekstDoWyswietlenia) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
-    cout << tekstDoWyswietlenia << endl;
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);// bia³y
-    Sleep(1900);
-}
-
-void zapiszZmienionyKontaktDoPliku(Kontakt pojedynczyKontakt, int idZalogowanegoUzytkownika){
+void zapiszZmienionyKontaktDoPliku(Kontakt pojedynczyKontakt, int idZalogowanegoUzytkownika) {
     string linia;
     size_t pozycjaSeparatora;
     int idKontaktu;
@@ -239,10 +244,7 @@ void zapiszZmienionyKontaktDoPliku(Kontakt pojedynczyKontakt, int idZalogowanego
     plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
     plikKopia.open(kopiaPlikuZKontaktami.c_str(),ios::in);
     if(plik.good() == false || plikKopia.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        system("pause");
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku.");
         return;
     }
     while(getline(plikKopia, linia)) {
@@ -347,10 +349,7 @@ void usunKontaktZPliku(int idKontaktuDoUsuniececia) {
     plik.open(plikZKontaktami.c_str(), ios::out | ios::app);
     plikKopia.open(kopiaPlikuZKontaktami.c_str(),ios::in);
     if(plik.good() == false || plikKopia.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        system("pause");
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku.");
         return;
     }
 
@@ -400,7 +399,7 @@ int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
     cin >> nazwa;
     for (int i=0; i<iloscUzytkownikow; i++) {
         if (uzytkownicy[i].nazwa == nazwa) {
-            cout << "Taki uzytkownik istnieje. Wpis inna nazwe uzytkownika: ";
+            cout << "Taki uzytkownik nie istnieje. Wpisz inna nazwe uzytkownika: ";
             cin >> nazwa;
             i = 0;
         }
@@ -415,10 +414,7 @@ int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
     fstream plikUzytkownicy;
     plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        system("pause");
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku.");
         return 0;
     }
 
@@ -437,9 +433,7 @@ void zapiszWszystkichUzytkownikowDoPliku (vector<Uzytkownik> &uzytkownicy, int i
     fstream plikUzytkownicy;
     plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku.");
         system("pause");
         return;
     }
@@ -503,10 +497,7 @@ int wczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
 
     plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(),ios::in);
     if(plikUzytkownicy.good() == false) {
-        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
-        cout << "Wystapil problem z odczytem kontaktow z plikUzytkownicyu." << endl;
-        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-        system("pause");
+        wyswietlKomunikatKrytyczny("Wystapil problem z odczytem kontaktow z pliku: " + plikZDanymiUzytkownikow );
         return 0;
     }
 
@@ -604,21 +595,21 @@ int main() {
                 cout << "Podaj ID kontaktu ktory chcesz edytowac: ";
                 cin >> id;
                 system("cls");
-                if (wyszukiwanieID(kontakty, id, iloscKontaktow)){
-                cout << "EDYCJA: " << endl << endl;
-                cout << "Co chcesz edytowac?: " << endl;
-                cout << "1. Imie" << endl;
-                cout << "2. Nazwisko" << endl;
-                cout << "3. Telefon" << endl;
-                cout << "4. Email" << endl;
-                cout << "5. Adres" << endl;
-                cout << "6. Wszystko" << endl;
-                cout << "9. Nic" << endl << endl;
-                cout << "wybor: ";
-                cin >> wybor;
-                cin.sync();
-                if (wybor == '9') break;
-                edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48, idZalogowanegoUzytkownika);
+                if (wyszukiwanieID(kontakty, id, iloscKontaktow)) {
+                    cout << "EDYCJA: " << endl << endl;
+                    cout << "Co chcesz edytowac?: " << endl;
+                    cout << "1. Imie" << endl;
+                    cout << "2. Nazwisko" << endl;
+                    cout << "3. Telefon" << endl;
+                    cout << "4. Email" << endl;
+                    cout << "5. Adres" << endl;
+                    cout << "6. Wszystko" << endl;
+                    cout << "9. Nic" << endl << endl;
+                    cout << "wybor: ";
+                    cin >> wybor;
+                    cin.sync();
+                    if (wybor == '9') break;
+                    edytujDaneKontaktowe(kontakty, iloscKontaktow,id, wybor - 48, idZalogowanegoUzytkownika);
                 } else {
                     system("cls");
                     wyswietlKomunikatNeutralny("Kontakt o takim ID nie istnieje. W celu sprawdzenia ID wyszukaj lub wyswietl wszystkie kontakty");
@@ -682,10 +673,7 @@ int main() {
                 exit(0);
                 break;
             default:
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
-                cout << "Nie ma takiej opcji w menu";
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
-                Sleep(1500);
+                wyswietlKomunikatOstrzegawczy("Nie ma takiej opcji w menu");
                 break;
             }
         }
