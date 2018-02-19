@@ -437,9 +437,9 @@ void zapiszWszystkichUzytkownikowDoPliku (vector<Uzytkownik> &uzytkownicy, int i
     fstream plikUzytkownicy;
     plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12); //czerwony
         cout << "Wystapil problem przy probie zapisu danych do pliku." << endl;
-        //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
         system("pause");
         return;
     }
