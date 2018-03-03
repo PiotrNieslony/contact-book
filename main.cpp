@@ -6,13 +6,13 @@
 
 using namespace std;
 
+string plikZKontaktami = "Adresaci.txt";
+string plikZDanymiUzytkownikow = "Uzytkownicy.txt";
+
 struct Kontakt {
     int id;
     string imie, nazwisko, telefon, email, adres;
 };
-
-string plikZKontaktami = "Adresaci.txt";
-string plikZDanymiUzytkownikow = "Uzytkownicy.txt";
 
 void wyswietlKomunikatNeutralny(string tekstDoWyswietlenia) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);// zielony
@@ -414,7 +414,7 @@ int rejestracja(vector<Uzytkownik> &uzytkownicy, int iloscUzytkownikow) {
     fstream plikUzytkownicy;
     plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku.");
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku: " + plikZDanymiUzytkownikow);
         return 0;
     }
 
@@ -433,7 +433,7 @@ void zapiszWszystkichUzytkownikowDoPliku (vector<Uzytkownik> &uzytkownicy, int i
     fstream plikUzytkownicy;
     plikUzytkownicy.open(plikZDanymiUzytkownikow.c_str(), ios::out | ios::app);
     if(plikUzytkownicy.good() == false) {
-        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku.");
+        wyswietlKomunikatKrytyczny("Wystapil problem przy probie zapisu danych do pliku: " + plikZDanymiUzytkownikow);
         system("pause");
         return;
     }
